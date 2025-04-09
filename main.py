@@ -36,27 +36,52 @@ def main():
     screen = init_game()
     clock = pygame.time.Clock()
     running = True
-    square_info = {
+    squares = {}
+    square_ct = 1
+    squares['square 1'] = {
         'color' : (255, 0 , 255),
         'size' : 50,
         'speed' : [5, 5],
-        'location' : [random.randint(50, 750), random.randint(50, 550)]
+        'location' : [random.randint(0, 750), random.randint(0, 550)]
     }
+    count_to_keyframe = 0
     while running:
         running = handle_events()
-        screen.fill(config.WHITE)
+        screen.fill((200, 200, 200))
+
+
+        count_to_keyframe += 1
+        if count_to_keyframe == config.FPS/6:
+            count_to_keyframe = 0
+            keys = pygame.key.get_pressed()
+            if keys[pygame.K_SPACE]:
+                square_ct += 1
+                squares[f'square {square_ct}'] = {
+                    'color' : (random.randint(0,225), random.randint(0,225), random.randint(0,225)),
+                    'size' : random.randint(25,75),
+                    'speed' : [random.randint(-7,7), random.randint(-7,7)],
+                    'location' : [random.randint(0, 700), random.randint(0, 500)]
+                }
 
         # Square
-        if not (0 < square_info['location'][0] < config.WINDOW_WIDTH - square_info['size']):
-            square_info['speed'][0] *= -1
-        if not (0 < square_info['location'][1] < config.WINDOW_HEIGHT - square_info['size']):
-            square_info['speed'][1] *= -1
+        del_list = []
+        for square in squares:
+            # Mouse
+            mouse_pos = pygame.mouse.get_pos()
+            if squares[square]['location'][0] < mouse_pos[0] < squares[square]['location'][0] + squares[square]['size'] and squares[square]['location'][1] < mouse_pos[1] < squares[square]['location'][1] + squares[square]['size']:
+                del_list.append(square)
 
-        square_info['location'][0] += square_info['speed'][0]
-        square_info['location'][1] += square_info['speed'][1]
+            if not (0 < squares[square]['location'][0] < config.WINDOW_WIDTH-1 - squares[square]['size']):
+                squares[square]['speed'][0] *= -1
+            if not (0 < squares[square]['location'][1] < config.WINDOW_HEIGHT-1 - squares[square]['size']):
+                squares[square]['speed'][1] *= -1
 
-        draw_rect(screen, square_info['color'], square_info['location'][0], square_info['location'][1], square_info['size'], square_info['size'])
+            squares[square]['location'][0] += squares[square]['speed'][0]
+            squares[square]['location'][1] += squares[square]['speed'][1]
 
+            draw_rect(screen, squares[square]['color'], squares[square]['location'][0], squares[square]['location'][1], squares[square]['size'], squares[square]['size'])
+        for square in del_list:
+            del(squares[square])
         # Text
         draw_text(screen, 'Ethan Lawrence', config.BLACK, [50, 50], bold=True)
         draw_text(screen, 'Carrer Tech', config.BLUE, [50, 100])
