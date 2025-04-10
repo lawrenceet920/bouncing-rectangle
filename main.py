@@ -68,7 +68,8 @@ def main():
         for square in squares:
             # Mouse
             mouse_pos = pygame.mouse.get_pos()
-            if squares[square]['location'][0] < mouse_pos[0] < squares[square]['location'][0] + squares[square]['size'] and squares[square]['location'][1] < mouse_pos[1] < squares[square]['location'][1] + squares[square]['size']:
+            this_square = pygame.Rect(squares[square]['location'][0], squares[square]['location'][1], squares[square]['size'], squares[square]['size'])
+            if this_square.collidepoint(mouse_pos):
                 del_list.append(square)
 
             if not (0 < squares[square]['location'][0] < config.WINDOW_WIDTH-1 - squares[square]['size']):
